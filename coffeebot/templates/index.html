@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="hero"><div class="hero-copy"><p class="eyebrow">GOOD GROUNDS. NEW BEGINNINGS.</p><h1>A little coffee.<br>A second life.</h1><p>Find coffee grounds near you.<br>Give them a place to grow.</p></div><div class="plant-art" aria-hidden="true"><div class="leaf leaf-one"></div><div class="leaf leaf-two"></div><div class="stem"></div><div class="cup"><span>grow<br>again.</span></div><div class="soil"></div></div></section>
+<section class="summary" aria-label="Current availability"><div><strong id="total-weight">{{ '%g'|format(total) }}</strong><span>kg available</span></div><div><strong>{{ hubs|length }}</strong><span>community hubs</span></div><div class="summary-note">Small actions.<br>Shared impact.</div></section>
+<div class="section-heading"><div><p class="eyebrow">AROUND THE NEIGHBOURHOOD</p><h2>Find your next hub</h2></div><button type="button" id="locate" class="button secondary compact">Use my location</button></div>
+<p id="location-status" class="muted small">Demo hubs illustrate the workflow; these are not operating collection sites.</p>
+<p class="connection" id="connection-status" role="status">● Checking availability every 10 seconds while this page is open</p>
+<div id="alerts" class="alerts" aria-live="polite"></div>
+<section class="hub-grid" id="hub-list" aria-label="Community hubs">
+{% for hub in hubs %}
+<article class="hub-card" data-hub-id="{{ hub.id }}" data-lat="{{ hub.latitude }}" data-lon="{{ hub.longitude }}">
+<div class="hub-illustration theme-{{ loop.index }}" aria-hidden="true"><span class="hub-number">0{{ loop.index }}</span><span class="hub-symbol">{% if loop.index == 1 %}⌂{% elif loop.index == 2 %}♧{% else %}▥{% endif %}</span><span class="illustration-label">COFFEE / COMMUNITY / CIRCULARITY</span></div>
+<div class="hub-content"><div class="card-topline"><span class="badge availability-badge">{{ 'Available' if hub.available_kg else 'No grounds available' }}</span><span class="distance small"></span></div><h3>{{ hub.name }}</h3><p class="muted address">{{ hub.address }}</p><div class="weight-row"><strong><span class="hub-weight">{{ '%g'|format(hub.available_kg) }}</span> <small>kg</small></strong><span class="muted small"><span class="batch-count">{{ hub.batch_count }}</span> available batches</span></div><p class="muted small updated">{{ hub.last_update|sgtime }}</p><a class="button secondary full" href="{{ url_for('web.hub', hub_id=hub.id) }}">Explore hub <span aria-hidden="true">↗</span></a></div>
+</article>{% endfor %}
+</section>
+<section class="how-it-works"><p class="eyebrow">FROM CUP TO COMMUNITY</p><h2>Good things come around.</h2><div class="steps"><div><span>01</span><h3>Drop it off</h3><p>Drivers weigh and record grounds at a nearby hub.</p></div><div><span>02</span><h3>Find your grounds</h3><p>See what is available and where to collect it.</p></div><div><span>03</span><h3>Give it new life</h3><p>Community members take the next step towards reuse.</p></div></div></section>
+<div id="poll-config" hidden data-initial-ids="{{ initial_ids|tojson|forceescape }}"></div>
+{% endblock %}
