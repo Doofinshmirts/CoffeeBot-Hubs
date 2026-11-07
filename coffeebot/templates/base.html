@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#3B5340">
+<meta name="description" content="Give coffee grounds a second life. Find community hubs and record coffee-ground drop-offs.">
+<title>{% block title %}CoffeeBot Hubs{% endblock %}</title>
+<link rel="icon" href="{{ url_for('static', filename='bean.svg') }}" type="image/svg+xml">
+<link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+<script defer src="{{ url_for('static', filename='app.js') }}"></script>
+</head><body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header"><a class="brand" href="{{ url_for('web.index') }}"><img src="{{ url_for('static', filename='bean.svg') }}" width="36" height="36" alt=""><span>CoffeeBot<small>COMMUNITY HUBS</small></span></a>
+<span class="demo-label">Student prototype</span></header>
+<main id="main" class="shell">
+{% for message in get_flashed_messages() %}<div class="notice" role="status">{{ message }}</div>{% endfor %}
+{% block content %}{% endblock %}
+</main>
+<nav class="bottom-nav" aria-label="Main navigation">
+<a href="{{ url_for('web.index') }}" {% if request.endpoint in ['web.index','web.hub'] %}aria-current="page"{% endif %}><span aria-hidden="true">⌖</span>Find grounds</a>
+{% if session.get('staff') %}
+<a href="{{ url_for('web.dropoff') }}" {% if request.endpoint == 'web.dropoff' %}aria-current="page"{% endif %}><span aria-hidden="true">＋</span>Drop off</a>
+<a href="{{ url_for('web.manage') }}" {% if request.endpoint == 'web.manage' %}aria-current="page"{% endif %}><span aria-hidden="true">▤</span>Batches</a>
+<form method="post" action="{{ url_for('web.logout') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="nav-button" type="submit"><span aria-hidden="true">↗</span>Sign out</button></form>
+{% else %}<a href="{{ url_for('web.login') }}" {% if request.endpoint == 'web.login' %}aria-current="page"{% endif %}><span aria-hidden="true">＋</span>Driver sign-in</a>{% endif %}
+</nav>
+</body></html>

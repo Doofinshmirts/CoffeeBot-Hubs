@@ -1,0 +1,6 @@
+{% extends 'base.html' %}{% block title %}{{ hub.name }} · CoffeeBot{% endblock %}
+{% block content %}<a class="back" href="{{ url_for('web.index') }}">← All hubs</a>
+<div class="page-intro"><p class="eyebrow">DEMONSTRATION HUB</p><h1>{{ hub.name }}</h1><p class="muted">{{ hub.address }}</p></div>
+<section class="detail-grid"><div class="panel"><span class="badge">{{ 'Available' if hub.available_kg else 'No grounds available' }}</span><p class="big-weight">{{ '%g'|format(hub.available_kg) }} <small>kg</small></p><p class="muted">of coffee grounds available</p><a class="button full" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&destination={{ hub.latitude }},{{ hub.longitude }}">Open directions ↗</a><p class="small muted">Illustrative location only. Do not travel here to collect grounds.</p></div>
+<div class="panel"><h2>Before you visit</h2><p>{{ hub.instructions }}</p><p class="small muted">Availability is shown when this page loads. Return to Find grounds for live updates.</p><h3>Available batches</h3>{% for batch in batches %}<div class="batch-line"><strong>{{ '%g'|format(batch.weight_kg|float) }} kg</strong><time>{{ batch.created_at|sgtime }}</time></div>{% else %}<p class="empty">No grounds here yet. Check another hub or return later.</p>{% endfor %}</div></section>
+{% endblock %}
