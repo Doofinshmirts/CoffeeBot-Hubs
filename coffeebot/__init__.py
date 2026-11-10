@@ -7,7 +7,7 @@ from flask import Flask, render_template, request
 from flask_wtf.csrf import CSRFProtect, CSRFError
 
 
-def create_app(config=None, repository=None):
+def create_app(config=None, repository=None, auth_service=None):
     load_dotenv(Path(__file__).resolve().parent.parent / '.env', interpolate=False)
     app = Flask(__name__)
     app.config.update(
@@ -16,6 +16,8 @@ def create_app(config=None, repository=None):
         STAFF_PASSWORD_HASH=os.environ.get('STAFF_PASSWORD_HASH', ''),
         SUPABASE_URL=os.environ.get('SUPABASE_URL', ''),
         SUPABASE_SECRET_KEY=os.environ.get('SUPABASE_SECRET_KEY', ''),
+        SUPABASE_PUBLISHABLE_KEY=os.environ.get('SUPABASE_PUBLISHABLE_KEY', ''),
+        APP_URL=os.environ.get('APP_URL', 'http://127.0.0.1:5000'),
         MAX_CONTENT_LENGTH=11 * 1024 * 1024,
         SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SAMESITE='Lax',
@@ -30,7 +32,14 @@ def create_app(config=None, repository=None):
     if repository is None:
         from .models import SupabaseRepository
         repository = SupabaseRepository(app.config['SUPABASE_URL'], app.config['SUPABASE_SECRET_KEY'])
+    if auth_service is None:
+        from .services import SupabaseAuthService
+        auth_service = SupabaseAuthService(
+            app.config['SUPABASE_URL'], app.config['SUPABASE_PUBLISHABLE_KEY'],
+            app.config['APP_URL'].rstrip('/') + '/account/login',
+        )
     app.extensions['repository'] = repository
+    app.extensions['auth_service'] = auth_service
     CSRFProtect(app)
     from .controllers import bp, LoginThrottle
     app.extensions['login_throttle'] = LoginThrottle()

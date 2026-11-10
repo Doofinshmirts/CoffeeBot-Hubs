@@ -18,9 +18,14 @@
 <nav class="bottom-nav" aria-label="Main navigation">
 <a href="{{ url_for('web.index') }}" {% if request.endpoint in ['web.index','web.hub'] %}aria-current="page"{% endif %}><span aria-hidden="true">⌖</span>Find grounds</a>
 {% if session.get('staff') %}
-<a href="{{ url_for('web.dropoff') }}" {% if request.endpoint == 'web.dropoff' %}aria-current="page"{% endif %}><span aria-hidden="true">＋</span>Drop off</a>
+<a href="{{ url_for('web.index') }}"><span aria-hidden="true">＋</span>Choose hub</a>
 <a href="{{ url_for('web.manage') }}" {% if request.endpoint == 'web.manage' %}aria-current="page"{% endif %}><span aria-hidden="true">▤</span>Batches</a>
 <form method="post" action="{{ url_for('web.logout') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="nav-button" type="submit"><span aria-hidden="true">↗</span>Sign out</button></form>
-{% else %}<a href="{{ url_for('web.login') }}" {% if request.endpoint == 'web.login' %}aria-current="page"{% endif %}><span aria-hidden="true">＋</span>Driver sign-in</a>{% endif %}
+{% elif session.get('user_id') %}
+<a href="{{ url_for('web.index') }}"><span aria-hidden="true">＋</span>Choose hub</a>
+<form method="post" action="{{ url_for('web.logout') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="nav-button" type="submit"><span aria-hidden="true">↗</span>Sign out</button></form>
+{% else %}
+<a href="{{ url_for('web.account_login') }}" {% if request.endpoint in ['web.account_login','web.account_register','web.staff_login'] %}aria-current="page"{% endif %}><span aria-hidden="true">＋</span>Sign in</a>
+{% endif %}
 </nav>
 </body></html>

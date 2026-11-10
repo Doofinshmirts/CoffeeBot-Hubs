@@ -1,0 +1,8 @@
+{% extends 'base.html' %}{% block title %}Community sign-in · CoffeeBot{% endblock %}
+{% block content %}<div class="narrow"><div class="page-intro"><p class="eyebrow">VERIFIED HUB ACCESS</p><h1>Sign in.</h1><p class="muted">Use your individual or organization account to collect grounds responsibly.</p></div>
+<form method="post" class="panel form-stack"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="next" value="{{ next_url }}">{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+<label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" required>
+<label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required>
+<button class="button full" type="submit">Sign in →</button>
+<p class="small">New here? <a class="text-link" href="{{ url_for('web.account_register') }}">Create an account</a></p>
+<p class="small muted">CoffeeBot drivers use the separate <a href="{{ url_for('web.staff_login') }}">driver sign-in</a>.</p></form></div>{% endblock %}

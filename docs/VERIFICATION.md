@@ -1,45 +1,40 @@
 # Verification and handoff status
 
-Checked on 5 November 2026.
+Checked on 10 November 2026.
 
 ## Implemented
 
-- Python MVC source, seven rendered templates (including error screen), responsive styles and browser interactions.
-- Driver login, CSRF protection, shared-account login throttling, drop-off validation, private image handling, duplicate submission protection, collection and public availability API.
-- Supabase repository adapter, schema, demonstration seed script, Render Blueprint, local configuration helper, font download helper and source packaging helper.
-- Automated Flask workflow tests and browser workflow checks, ready to run after dependencies are installed.
+- Public individual and organization registration with contact details and email confirmation through Supabase Auth.
+- Server-controlled profiles; public registration always creates a community role and cannot self-assign driver permissions.
+- Preserved legacy driver login plus a private helper for creating named driver accounts later.
+- Authenticated, hub-specific access sessions with a five-minute simulated lid/scale window and one open session per hub.
+- Driver deposits with source, weight, private photo, and atomic inventory increase.
+- Community collections with starting weight, required remaining weight/photo, database-calculated kilograms taken, and atomic inventory decrease.
+- Private evidence storage, mobile screens, session countdown, public availability polling, Render configuration, and updated demo instructions.
 
-## Verified with the live Supabase connection
+## Verified against live Supabase
 
-- CoffeeBot Hubs project created: `mbpvfilblwuayldznsev`, Singapore region, approved $0/month quote.
-- `hubs` and `dropoffs` tables exist with RLS enabled.
-- The anonymous role has neither SELECT nor INSERT privileges on either table.
-- `dropoff-evidence` bucket is private, with a 10 MB limit.
-- Security advisor returned informational RLS-without-policy notices only. This is intentional for server-only access: https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy
-- Live hub count is zero. The seed tool call was cancelled and was not retried. Apply `sql/seed.sql` when ready.
+- Additive migrations `20261110_account_hub_access.sql` and `20261110_fix_access_expiry.sql` applied successfully to project `mbpvfilblwuayldznsev`.
+- Existing data was preserved: 3 hubs, 4 drop-offs, and 6.50 kg of inventory before any new demo activity.
+- New `profiles`, `hub_access_sessions`, and `collections` tables have RLS enabled.
+- Anonymous/authenticated Data API privileges are revoked; application RPC functions are executable only by the service role.
+- The auth-user trigger creates a community profile and hardcodes the role rather than trusting registration metadata.
+- Security advisor reports only the expected informational no-policy notices for server-only tables. No destructive migration or data deletion was performed.
 
-## Checks actually run locally
+## Automated checks completed
 
-- Python compilation for application and tests: passed.
-- JavaScript syntax check: passed.
-- All seven Jinja templates rendered using synthetic offline review data: passed.
-- Offline image/weight checks: eight invalid weights rejected; 5 kg accepted; image resized to <=1600px; metadata absent; invalid and oversized files rejected.
-- Headless Edge rendered all seven pages at 390px, and the home page at 360, 390, 768 and 1280px without horizontal overflow.
-- Home, drop-off and desktop screenshots visually inspected. Uses system-font fallbacks until font assets are downloaded.
+- Python compilation: passed.
+- Flask workflow suite: **38 passed**, including external-login redirect and expired-session regressions.
+- Headless mobile browser workflow: passed for registration, organization fields, simulated lid/scale access, driver deposit, community collection, responsive layout, and availability updates.
+- `git diff --check`: passed.
+- Browser tests use synthetic in-memory fixtures and do not claim live hardware integration.
 
-The initial offline checks used cached Jinja 3.1.5 and runtime Pillow 13.0.0. After the user installed the pinned dependencies, the Flask pytest suite ran successfully: **14 passed**. An incorrect CSRF timeout value type was found and corrected to integer seconds. These tests use an in-memory repository and do not certify the live Supabase integration. The full browser workflow suite still awaits execution.
+## Required after merge
 
-## Remaining before calling the prototype live
+1. Allow `https://coffeebot-hubs.onrender.com/account/login` in Supabase Authentication > URL Configuration and set the Site URL to the deployed origin.
+2. Let Render deploy `main`, then confirm `/health` returns `{"status":"ok"}` and load the hub list to confirm database connectivity.
+3. Register a real presentation account, confirm its email, and rehearse the driver-to-community journey in two independent browser sessions.
+4. Keep the cardboard lid and scale language honest: the UI simulates their controls; no real lock or scale is connected.
+5. Record a backup walkthrough after the live rehearsal. Never show passwords, contact details, API secrets, or the Render environment screen.
 
-1. Dependency installation completed; Flask workflow tests pass.
-2. Save the Supabase server secret and staff password using `python scripts/setup_local.py` (private local prompts).
-3. Apply `sql/seed.sql` to add the three explicitly fictional hubs.
-4. Run `python scripts/fetch_fonts.py` to bundle Inter and Fraunces plus licenses. Until then, system fonts render the interface.
-5. Run `python -m pytest -q`, then the fixture browser checks and the actual Supabase two-session workflow.
-6. Resolve GitHub authorization and connect Render. Create the repository, deploy the Free service and record the public URL here.
-7. Record the verified live walkthrough and do the physical phone-and-scale rehearsal.
-
-Public deployment URL: pending deployment.
-Verified live workflow recording: pending live integration.
-
-No claim is made that the fixture screenshots or source ZIP demonstrate a live cloud-connected workflow.
+Public deployment URL: https://coffeebot-hubs.onrender.com

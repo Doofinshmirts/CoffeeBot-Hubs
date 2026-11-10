@@ -21,7 +21,9 @@ if __name__ == '__main__':
     config = '\n'.join([
         'SUPABASE_URL=https://mbpvfilblwuayldznsev.supabase.co',
         'SUPABASE_SECRET_KEY=' + key,
+        'SUPABASE_PUBLISHABLE_KEY=sb_publishable_CM3_mOmJmsUWUteQxezhgA_NtTQjWCA',
         'SECRET_KEY=' + secrets.token_hex(32),
+        'APP_URL=http://127.0.0.1:5000',
         'STAFF_USERNAME=driver',
         'STAFF_PASSWORD_HASH=' + generate_password_hash(password),
         'COOKIE_SECURE=false', 'PORT=5000', ''
