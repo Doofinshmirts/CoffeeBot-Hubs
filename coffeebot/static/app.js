@@ -18,6 +18,60 @@ document.querySelectorAll('.collect-form').forEach(form => form.addEventListener
   if (!window.confirm('Confirm that this entire batch has been collected?')) event.preventDefault();
 }));
 
+const accountType = document.querySelector('#account_type');
+const organizationFields = document.querySelector('#organization-fields');
+const updateOrganizationFields = () => {
+  if (!accountType || !organizationFields) return;
+  organizationFields.hidden = accountType.value !== 'organization';
+};
+accountType?.addEventListener('change', updateOrganizationFields);
+updateOrganizationFields();
+
+const remainingWeight = document.querySelector('#remaining_weight_kg');
+const startingWeight = document.querySelector('#starting-weight');
+const takenPreview = document.querySelector('#taken-preview');
+const updateTaken = () => {
+  if (!remainingWeight || !startingWeight || !takenPreview) return;
+  const before = Number(startingWeight.dataset.weight);
+  const after = Number(remainingWeight.value);
+  if (!remainingWeight.value || !Number.isFinite(after) || after < 0 || after >= before) {
+    takenPreview.textContent = 'Enter a new scale reading lower than the starting weight.';
+    return;
+  }
+  takenPreview.textContent = `${Number((before - after).toFixed(2))} kg will be recorded as collected.`;
+};
+remainingWeight?.addEventListener('input', updateTaken);
+updateTaken();
+
+const accessForm = document.querySelector('#hub-session-form');
+accessForm?.addEventListener('submit', () => {
+  const button = document.querySelector('#save-hub-session');
+  button.disabled = true;
+  button.textContent = 'Saving and locking lid…';
+});
+
+const deviceState = document.querySelector('[data-session-expires]');
+if (deviceState) {
+  const label = document.querySelector('#session-countdown');
+  const accessInputs = document.querySelectorAll('#hub-session-form input, #hub-session-form button, #hub-session-form select, #hub-session-form textarea');
+  const expiry = new Date(deviceState.dataset.sessionExpires).getTime();
+  const tick = () => {
+    const seconds = Math.max(0, Math.ceil((expiry - Date.now()) / 1000));
+    const minutes = Math.floor(seconds / 60);
+    if (seconds) {
+      label.textContent = `${minutes}:${String(seconds % 60).padStart(2, '0')} remaining`;
+      return;
+    }
+    deviceState.classList.remove('open');
+    deviceState.classList.add('locked');
+    deviceState.querySelector('strong').textContent = 'Lid locked';
+    deviceState.querySelector('small').textContent = 'Scale off · session expired';
+    accessInputs.forEach(input => { input.disabled = true; });
+  };
+  tick();
+  setInterval(tick, 1000);
+}
+
 const config = document.querySelector('#poll-config');
 if (config) {
   const initialIds = JSON.parse(config.dataset.initialIds);
@@ -44,7 +98,7 @@ if (config) {
         const card = document.querySelector(`[data-hub-id="${Number(hub.id)}"]`);
         if (!card) continue;
         card.querySelector('.hub-weight').textContent = String(Number(Number(hub.available_kg).toFixed(2)));
-        card.querySelector('.batch-count').textContent = hub.batch_count;
+        card.querySelector('.deposit-count').textContent = hub.deposit_count;
         card.querySelector('.availability-badge').textContent = hub.available_kg > 0 ? 'Available' : 'No grounds available';
         card.querySelector('.updated').textContent = date(hub.last_update);
       }

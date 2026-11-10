@@ -18,6 +18,10 @@ services:
         value: https://mbpvfilblwuayldznsev.supabase.co
       - key: SUPABASE_SECRET_KEY
         sync: false
+      - key: SUPABASE_PUBLISHABLE_KEY
+        value: sb_publishable_CM3_mOmJmsUWUteQxezhgA_NtTQjWCA
+      - key: APP_URL
+        value: https://coffeebot-hubs.onrender.com
       - key: STAFF_USERNAME
         value: driver
       - key: STAFF_PASSWORD_HASH
